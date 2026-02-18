@@ -213,10 +213,30 @@ export const updateUserProfile = async (uid: string, data: Partial<PersonalUser>
         updatedAt: Date.now()
     });
 
-    // Optional: Update Auth Profile (DisplayName) validation
     if (data.fullName && auth.currentUser) {
         await updateProfile(auth.currentUser, {
             displayName: data.fullName
+        });
+    }
+};
+
+export const updatePharmacyProfile = async (uid: string, data: Partial<PharmacyUser>) => {
+    // Update Firestore
+    await updateDoc(doc(db, "pharmacies", uid), {
+        ...data,
+        updatedAt: Date.now()
+    });
+
+    // Update Realtime Database
+    await update(ref(rtdb, 'pharmacies/' + uid), {
+        ...data,
+        updatedAt: Date.now()
+    });
+
+    // Optional: Update Auth Profile (DisplayName) validation
+    if (data.pharmacyName && auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+            displayName: data.pharmacyName
         });
     }
 };

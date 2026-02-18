@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 
 import { useAuth } from '../../context/AuthContext';
-import { updateDoc, doc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { updatePharmacyProfile } from '../../services/api';
 import { PharmacyUser } from '../../types/auth';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -63,7 +62,7 @@ export function PharmacyProfile() {
         if (!user) return;
 
         try {
-            await updateDoc(doc(db, "pharmacies", user.uid), {
+            await updatePharmacyProfile(user.uid, {
                 pharmacyName: profile.name,
                 phone: profile.phone,
                 address: profile.address,
@@ -71,8 +70,7 @@ export function PharmacyProfile() {
                 district: profile.district,
                 ownerName: profile.ownerName,
                 openingHours: profile.operatingHours, // Map back to schema
-                description: profile.description,
-                updatedAt: Date.now()
+                description: profile.description
             });
 
             await refreshUserData();

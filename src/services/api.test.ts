@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { registerPersonalUser, registerPharmacy } from './api';
+import { registerPersonalUser, registerPharmacy, updatePharmacyProfile } from './api';
+
+const mocks = vi.hoisted(() => ({
+    ref: vi.fn().mockReturnValue('mock-ref'),
+    set: vi.fn(),
+    update: vi.fn(),
+}));
 
 vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(),
@@ -13,6 +19,7 @@ vi.mock('firebase/auth', () => ({
 }));
 
 const mockSetDoc = vi.fn();
+const mockUpdateDoc = vi.fn();
 const mockDoc = vi.fn(() => 'mock-firestore-doc');
 
 vi.mock('firebase/firestore', () => ({
@@ -25,14 +32,8 @@ vi.mock('firebase/firestore', () => ({
     getDocs: vi.fn(),
     addDoc: vi.fn(),
     deleteDoc: vi.fn(),
-    updateDoc: vi.fn(),
+    updateDoc: (...args: any[]) => mockUpdateDoc(...args),
     getDoc: vi.fn(),
-}));
-
-const mocks = vi.hoisted(() => ({
-    ref: vi.fn().mockReturnValue('mock-ref'),
-    set: vi.fn(),
-    update: vi.fn(),
 }));
 
 vi.mock('firebase/database', () => ({
@@ -126,6 +127,35 @@ describe('Registration API', () => {
                 uid: 'test-uid',
                 role: 'pharmacy',
                 pharmacyName: 'Test Pharmacy'
+            })
+        );
+    });
+
+    it('updatePharmacyProfile should update Firestore and Realtime Database', async () => {
+        const updateData = {
+            pharmacyName: 'Updated Pharmacy',
+            phone: '1112223333'
+        };
+
+        await updatePharmacyProfile('test-uid', updateData);
+
+        // Verify Firestore update
+        expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'pharmacies', 'test-uid');
+        expect(mockUpdateDoc).toHaveBeenCalledWith(
+            'mock-firestore-doc',
+            expect.objectContaining({
+                pharmacyName: 'Updated Pharmacy',
+                phone: '1112223333'
+            })
+        );
+
+        // Verify Realtime Database update
+        expect(mocks.ref).toHaveBeenCalledWith(expect.anything(), 'pharmacies/test-uid');
+        expect(mocks.update).toHaveBeenCalledWith(
+            'mock-ref',
+            expect.objectContaining({
+                pharmacyName: 'Updated Pharmacy',
+                phone: '1112223333'
             })
         );
     });
