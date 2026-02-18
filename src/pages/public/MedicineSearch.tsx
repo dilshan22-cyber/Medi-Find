@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { Card } from '../../components/ui/Card';
-import { Pill, Search, Map, ShieldCheck } from 'lucide-react';
+import { Pill, Search, Map } from 'lucide-react';
 export function MedicineSearch() {
   const location = useLocation();
   const navigate = useNavigate();

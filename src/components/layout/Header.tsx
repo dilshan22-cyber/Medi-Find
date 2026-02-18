@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, HeartPulse } from 'lucide-react';
+import { Menu, X, LogOut, HeartPulse } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../context/AuthContext';
+import { PharmacyUser } from '../../types/auth';
 type UserRole = 'public' | 'user' | 'pharmacy' | 'admin';
 interface HeaderProps {
   role?: UserRole;
@@ -14,6 +16,11 @@ export function Header({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { userData } = useAuth();
+
+  const displayName = role === 'pharmacy'
+    ? (userData as PharmacyUser)?.pharmacyName || 'Pharmacy'
+    : role.charAt(0).toUpperCase() + role.slice(1);
 
   const handleLogout = () => {
     // Navigate to home page
@@ -110,7 +117,7 @@ export function Header({
             </Link>
           </div> : <div className="flex items-center gap-4 ml-4">
             <span className="text-sm text-gray-500 font-medium px-3 py-1 bg-gray-100 rounded-full">
-              {role.charAt(0).toUpperCase() + role.slice(1)}
+              {displayName}
             </span>
             <Button variant="outline" size="default" leftIcon={<LogOut className="h-5 w-5" />} onClick={handleLogout}>
               Logout

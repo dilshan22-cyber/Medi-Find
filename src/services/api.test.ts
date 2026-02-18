@@ -13,7 +13,7 @@ vi.mock('firebase/auth', () => ({
 }));
 
 const mockSetDoc = vi.fn();
-const mockDoc = vi.fn();
+const mockDoc = vi.fn(() => 'mock-firestore-doc');
 
 vi.mock('firebase/firestore', () => ({
     getFirestore: vi.fn(),
@@ -29,10 +29,24 @@ vi.mock('firebase/firestore', () => ({
     getDoc: vi.fn(),
 }));
 
+const mocks = vi.hoisted(() => ({
+    ref: vi.fn().mockReturnValue('mock-ref'),
+    set: vi.fn(),
+    update: vi.fn(),
+}));
+
+vi.mock('firebase/database', () => ({
+    getDatabase: vi.fn(),
+    ref: mocks.ref,
+    set: mocks.set,
+    update: mocks.update,
+}));
+
 // Mock local firebase lib
 vi.mock('../lib/firebase', () => ({
     auth: {},
     db: {},
+    rtdb: {},
 }));
 
 describe('Registration API', () => {
@@ -59,6 +73,17 @@ describe('Registration API', () => {
                 role: 'personal',
                 city: 'Colombo 03',
                 district: 'Colombo',
+            })
+        );
+
+        // Verify Realtime Database write
+        expect(mocks.ref).toHaveBeenCalledWith(expect.anything(), 'users/test-uid');
+        expect(mocks.set).toHaveBeenCalledWith(
+            'mock-ref',
+            expect.objectContaining({
+                uid: 'test-uid',
+                role: 'personal',
+                city: 'Colombo 03'
             })
         );
     });
@@ -90,6 +115,17 @@ describe('Registration API', () => {
                 city: 'Kandy',
                 district: 'Kandy',
                 ownerName: 'Test Owner',
+            })
+        );
+
+        // Verify Realtime Database write
+        expect(mocks.ref).toHaveBeenCalledWith(expect.anything(), 'pharmacies/test-uid');
+        expect(mocks.set).toHaveBeenCalledWith(
+            'mock-ref',
+            expect.objectContaining({
+                uid: 'test-uid',
+                role: 'pharmacy',
+                pharmacyName: 'Test Pharmacy'
             })
         );
     });

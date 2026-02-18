@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, Link, useLocation } from 'react-router-dom';
 import { Info } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -24,7 +24,7 @@ export function SearchResults() {
   // Sort and Filter State
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
   const [filterInStock, setFilterInStock] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen] = useState(false);
 
   useEffect(() => {
     // Try to get location

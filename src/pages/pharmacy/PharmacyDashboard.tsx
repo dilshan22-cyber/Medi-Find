@@ -1,19 +1,38 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Package, AlertTriangle, TrendingUp, Plus } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { PharmacyUser } from '../../types/auth';
+
 export function PharmacyDashboard() {
+  const { userData } = useAuth();
+  const pharmacyUser = userData as PharmacyUser;
+  const pharmacyName = pharmacyUser?.pharmacyName || 'Pharmacy';
+  const isVerified = pharmacyUser?.status === 'verified';
+  const isPending = pharmacyUser?.status === 'pending';
+
   const navigate = useNavigate();
   return <div className="p-8 space-y-8">
     <div className="flex justify-between items-center">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-lg text-gray-600 mt-1">
-          Welcome back, HealthPlus Pharmacy
+          Welcome back, {pharmacyName}
         </p>
+        {!isVerified && (
+          <div className={`mt-4 p-4 rounded-lg border ${isPending ? 'bg-yellow-50 border-yellow-200 text-yellow-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+            <p className="font-medium">
+              {isPending
+                ? "Your account is currently under review. Some features are restricted until verification is complete."
+                : "Your account verification was rejected. Please contact support."}
+            </p>
+          </div>
+        )}
       </div>
-      <Button leftIcon={<Plus className="h-5 w-5" />}>Add Medicine</Button>
+      {isVerified && (
+        <Button leftIcon={<Plus className="h-5 w-5" />} onClick={() => navigate('/pharmacy/stock')}>Add Medicine</Button>
+      )}
     </div>
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -83,6 +102,7 @@ export function PharmacyDashboard() {
             variant="outline"
             className="h-auto py-6 flex flex-col items-center justify-center gap-2"
             onClick={() => navigate('/pharmacy/stock')}
+            disabled={!isVerified}
           >
             <Package className="h-8 w-8 text-blue-600" />
             <span>Update Stock</span>
@@ -90,7 +110,8 @@ export function PharmacyDashboard() {
           <Button
             variant="outline"
             className="h-auto py-6 flex flex-col items-center justify-center gap-2"
-            onClick={() => navigate('/pharmacy/stock')}
+            onClick={() => navigate('/pharmacy/prices')} // Assuming prices route exists, originally pointed to stock
+            disabled={!isVerified}
           >
             <Tag className="h-8 w-8 text-green-600" />
             <span>Update Prices</span>

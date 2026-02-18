@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Check, Navigation, SlidersHorizontal } from 'lucide-react';
 import { Button } from '../../components/ui/Button';

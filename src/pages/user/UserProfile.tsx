@@ -16,7 +16,6 @@ export function UserProfile() {
         firstName: '',
         lastName: '',
         phone: '',
-        phone: '',
         city: '',
         district: ''
     });
@@ -27,7 +26,6 @@ export function UserProfile() {
             setFormData({
                 firstName: names[0] || '',
                 lastName: names.slice(1).join(' ') || '',
-                phone: userData.phone || '',
                 phone: userData.phone || '',
                 city: userData.city || '',
                 district: userData.district || ''

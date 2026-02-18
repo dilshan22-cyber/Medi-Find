@@ -1,0 +1,16 @@
+﻿src/App.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/layout/Footer.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/layout/Header.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/layout/Header.tsx(3,19): error TS6133: 'User' is declared but its value is never read.
+src/components/layout/Sidebar.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/components/PharmacyCard.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/pages/pharmacy/PharmacyDashboard.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/pages/pharmacy/PharmacySettings.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/pages/public/MedicineSearch.tsx(1,1): error TS6192: All imports in import declaration are unused.
+src/pages/public/MedicineSearch.tsx(5,29): error TS6133: 'ShieldCheck' is declared but its value is never read.
+src/pages/public/PriceComparison.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/public/SearchResults.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/public/SearchResults.tsx(27,22): error TS6133: 'setFilterOpen' is declared but its value is never read.
+src/pages/user/SavedMedicines.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/user/UserProfile.tsx(19,9): error TS1117: An object literal cannot have multiple properties with the same name.
+src/pages/user/UserProfile.tsx(31,17): error TS1117: An object literal cannot have multiple properties with the same name.

@@ -14,7 +14,8 @@ import {
     addDoc,
     deleteDoc
 } from "firebase/firestore";
-import { auth, db } from "../lib/firebase";
+import { ref, set, update } from "firebase/database";
+import { auth, db, rtdb } from "../lib/firebase";
 import { PersonalUser, PharmacyUser } from "../types/auth";
 
 // --- Authentication & Registration ---
@@ -39,12 +40,15 @@ export const registerPersonalUser = async (email: string, password: string, data
 
     try {
         await setDoc(doc(db, "patients", user.uid), userData);
+
+        // Save to Realtime Database
+        await set(ref(rtdb, 'users/' + user.uid), userData);
+
     } catch (e: any) {
-        console.error("Firestore write failed (non-fatal):", e);
+        console.error("Firestore/RTDB write failed (non-fatal):", e);
         // We do NOT throw here. We allow the user to be created in Auth.
         // They can update their profile later in the UserProfile page.
     }
-    return userData;
     return userData;
 };
 
@@ -69,8 +73,12 @@ export const registerPharmacy = async (email: string, password: string, data: Om
 
     try {
         await setDoc(doc(db, "pharmacies", user.uid), pharmacyData);
+
+        // Save to Realtime Database
+        await set(ref(rtdb, 'pharmacies/' + user.uid), pharmacyData);
+
     } catch (e: any) {
-        console.error("Firestore write failed (non-fatal):", e);
+        console.error("Firestore/RTDB write failed (non-fatal):", e);
         // We do NOT throw here. We allow the user to be created in Auth.
         // They can update their profile later in the PharmacyProfile page.
     }
@@ -87,6 +95,9 @@ export const getPendingPharmacies = async () => {
 
 export const verifyPharmacy = async (uid: string, status: 'verified' | 'rejected') => {
     await updateDoc(doc(db, "pharmacies", uid), { status });
+
+    // Update in Realtime Database
+    await update(ref(rtdb, 'pharmacies/' + uid), { status });
 };
 
 // --- Inventory Management ---
@@ -108,6 +119,8 @@ export interface InventoryItem {
     lowStockThreshold: number;
     available: boolean;
     lastUpdated: number;
+    description?: string;
+    category?: string;
 }
 
 export const addMedicineToInventory = async (pharmacyId: string, item: Omit<InventoryItem, 'id' | 'pharmacyId' | 'lastUpdated'>) => {
@@ -190,6 +203,12 @@ export const searchMedicines = async (searchTerm: string, userLocation?: { lat: 
 export const updateUserProfile = async (uid: string, data: Partial<PersonalUser>) => {
     // Update Firestore
     await updateDoc(doc(db, "patients", uid), {
+        ...data,
+        updatedAt: Date.now()
+    });
+
+    // Update Realtime Database
+    await update(ref(rtdb, 'users/' + uid), {
         ...data,
         updatedAt: Date.now()
     });

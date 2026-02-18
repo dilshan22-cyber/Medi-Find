@@ -23,11 +23,27 @@ export function PharmacyRegistration() {
     latitude: '',
     longitude: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    licenseDocumentUrl: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 500 * 1024) { // 500KB limit
+        alert("File size exceeds 500KB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, licenseDocumentUrl: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +69,8 @@ export function PharmacyRegistration() {
         location: {
           lat: parseFloat(formData.latitude) || 0,
           lng: parseFloat(formData.longitude) || 0
-        }
+        },
+        licenseDocumentUrl: formData.licenseDocumentUrl
       });
       navigate('/pharmacy/login');
     } catch (err: any) {
@@ -98,6 +115,20 @@ export function PharmacyRegistration() {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Input label="Pharmacy Name" name="pharmacyName" type="text" placeholder="HealthPlus Pharmacy" required value={formData.pharmacyName} onChange={handleChange} />
               <Input label="License Number" name="licenseNumber" type="text" placeholder="PH-123456" required value={formData.licenseNumber} onChange={handleChange} />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Registration / License Document
+              </label>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">Max size 500KB. Images or PDF only.</p>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

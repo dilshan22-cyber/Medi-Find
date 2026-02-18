@@ -19,6 +19,7 @@ export interface PharmacyUser extends BaseUser {
     role: 'pharmacy';
     pharmacyName: string;
     licenseId: string;
+    licenseDocumentUrl?: string;
     ownerName: string;
     phone: string;
     address: string;

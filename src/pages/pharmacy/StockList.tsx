@@ -20,9 +20,10 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
   // Form State
   const [formData, setFormData] = useState({
     name: '',
-    category: '', // Note: API might not support category in InventoryItem directly if it's flat, need to check type
+    category: '',
     price: '',
-    stock: ''
+    stock: '',
+    description: ''
   });
 
   useEffect(() => {
@@ -49,13 +50,14 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
       setEditingItem(item);
       setFormData({
         name: item.medicineName,
-        category: '', // TODO: Store category in inventory or fetch from medicine catalog
+        category: item.category || '',
         price: item.price.toString(),
-        stock: item.stock.toString()
+        stock: item.stock.toString(),
+        description: item.description || ''
       });
     } else {
       setEditingItem(null);
-      setFormData({ name: '', category: '', price: '', stock: '' });
+      setFormData({ name: '', category: '', price: '', stock: '', description: '' });
     }
     setIsModalOpen(true);
   };
@@ -95,13 +97,24 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
           price,
           stock,
           available,
-          lowStockThreshold
+          lowStockThreshold,
+          category: formData.category,
+          description: formData.description
         });
 
         // Update local state directly
         setStockItems(prev => prev.map(item =>
           item.id === editingItem.id
-            ? { ...item, medicineName: formData.name, price, stock, available, lowStockThreshold }
+            ? {
+              ...item,
+              medicineName: formData.name,
+              price,
+              stock,
+              available,
+              lowStockThreshold,
+              category: formData.category,
+              description: formData.description
+            }
             : item
         ));
       } else {
@@ -111,7 +124,9 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
           price,
           stock,
           available,
-          lowStockThreshold
+          lowStockThreshold,
+          category: formData.category,
+          description: formData.description
         });
 
         // Add to local state
@@ -124,7 +139,9 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
           stock,
           available,
           lowStockThreshold,
-          lastUpdated: Date.now()
+          lastUpdated: Date.now(),
+          category: formData.category,
+          description: formData.description
         };
         setStockItems(prev => [...prev, newItem]);
       }
@@ -204,6 +221,7 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-4 text-lg font-semibold text-gray-900">Medicine Name</th>
+                <th className="px-6 py-4 text-lg font-semibold text-gray-900">Category</th>
                 <th className="px-6 py-4 text-lg font-semibold text-gray-900">Price</th>
                 <th className="px-6 py-4 text-lg font-semibold text-gray-900">Stock</th>
                 <th className="px-6 py-4 text-lg font-semibold text-gray-900">Status</th>
@@ -215,7 +233,13 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
                 const status = item.stock === 0 ? 'Out of Stock' : (item.stock < (item.lowStockThreshold || 50) ? 'Low Stock' : 'In Stock');
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-lg font-medium text-gray-900">{item.medicineName}</td>
+                    <td className="px-6 py-4 text-lg font-medium text-gray-900">
+                      <div>
+                        <div>{item.medicineName}</div>
+                        {item.description && <div className="text-sm text-gray-500 font-normal">{item.description}</div>}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-lg text-gray-700">{item.category || '-'}</td>
                     <td className="px-6 py-4 text-lg text-gray-900">LKR {item.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-lg text-gray-900">{item.stock}</td>
                     <td className="px-6 py-4">
@@ -277,6 +301,24 @@ export function StockList({ defaultFilter = 'all' }: { defaultFilter?: 'all' | '
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
+
+              <Input
+                label="Category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="e.g. Pain Killers, Antibiotics"
+              />
+
+              <div className="space-y-1">
+                <label className="block text-lg font-medium text-gray-900">Description</label>
+                <textarea
+                  className="w-full rounded-lg border-2 border-gray-300 p-3 min-h-[100px] text-lg focus:border-blue-500 focus:ring-blue-500"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Medicine details, dosage info, etc."
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <Input
                   label="Price (LKR)"
