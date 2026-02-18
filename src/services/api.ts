@@ -201,11 +201,11 @@ export const searchMedicines = async (searchTerm: string, userLocation?: { lat: 
 // --- User Profile Management ---
 
 export const updateUserProfile = async (uid: string, data: Partial<PersonalUser>) => {
-    // Update Firestore
-    await updateDoc(doc(db, "patients", uid), {
+    // Update Firestore using setDoc with merge: true to handle cases where doc might not exist
+    await setDoc(doc(db, "patients", uid), {
         ...data,
         updatedAt: Date.now()
-    });
+    }, { merge: true });
 
     // Update Realtime Database
     await update(ref(rtdb, 'users/' + uid), {
@@ -221,11 +221,11 @@ export const updateUserProfile = async (uid: string, data: Partial<PersonalUser>
 };
 
 export const updatePharmacyProfile = async (uid: string, data: Partial<PharmacyUser>) => {
-    // Update Firestore
-    await updateDoc(doc(db, "pharmacies", uid), {
+    // Update Firestore using setDoc with merge: true to handle cases where doc might not exist
+    await setDoc(doc(db, "pharmacies", uid), {
         ...data,
         updatedAt: Date.now()
-    });
+    }, { merge: true });
 
     // Update Realtime Database
     await update(ref(rtdb, 'pharmacies/' + uid), {

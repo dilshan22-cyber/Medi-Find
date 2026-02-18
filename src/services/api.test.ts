@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { registerPersonalUser, registerPharmacy, updatePharmacyProfile } from './api';
+import { registerPersonalUser, registerPharmacy, updatePharmacyProfile, updateUserProfile } from './api';
 
 const mocks = vi.hoisted(() => ({
     ref: vi.fn().mockReturnValue('mock-ref'),
@@ -139,14 +139,15 @@ describe('Registration API', () => {
 
         await updatePharmacyProfile('test-uid', updateData);
 
-        // Verify Firestore update
+        // Verify Firestore update using setDoc with merge: true
         expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'pharmacies', 'test-uid');
-        expect(mockUpdateDoc).toHaveBeenCalledWith(
+        expect(mockSetDoc).toHaveBeenCalledWith(
             'mock-firestore-doc',
             expect.objectContaining({
                 pharmacyName: 'Updated Pharmacy',
                 phone: '1112223333'
-            })
+            }),
+            { merge: true }
         );
 
         // Verify Realtime Database update
@@ -156,6 +157,36 @@ describe('Registration API', () => {
             expect.objectContaining({
                 pharmacyName: 'Updated Pharmacy',
                 phone: '1112223333'
+            })
+        );
+    });
+
+    it('updateUserProfile should update Firestore and Realtime Database', async () => {
+        const updateData = {
+            fullName: 'Updated Name',
+            city: 'New City'
+        };
+
+        await updateUserProfile('test-uid', updateData);
+
+        // Verify Firestore update using setDoc with merge: true
+        expect(mockDoc).toHaveBeenCalledWith(expect.anything(), 'patients', 'test-uid');
+        expect(mockSetDoc).toHaveBeenCalledWith(
+            'mock-firestore-doc',
+            expect.objectContaining({
+                fullName: 'Updated Name',
+                city: 'New City'
+            }),
+            { merge: true }
+        );
+
+        // Verify Realtime Database update
+        expect(mocks.ref).toHaveBeenCalledWith(expect.anything(), 'users/test-uid');
+        expect(mocks.update).toHaveBeenCalledWith(
+            'mock-ref',
+            expect.objectContaining({
+                fullName: 'Updated Name',
+                city: 'New City'
             })
         );
     });
