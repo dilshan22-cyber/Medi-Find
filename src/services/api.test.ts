@@ -24,15 +24,15 @@ const mockDoc = vi.fn(() => 'mock-firestore-doc');
 
 vi.mock('firebase/firestore', () => ({
     getFirestore: vi.fn(),
-    doc: (...args: any[]) => mockDoc(...args),
-    setDoc: (...args: any[]) => mockSetDoc(...args),
+    doc: (...args: any[]) => (mockDoc as any)(...args),
+    setDoc: (...args: any[]) => (mockSetDoc as any)(...args),
     collection: vi.fn(),
     query: vi.fn(),
     where: vi.fn(),
     getDocs: vi.fn(),
     addDoc: vi.fn(),
     deleteDoc: vi.fn(),
-    updateDoc: (...args: any[]) => mockUpdateDoc(...args),
+    updateDoc: (...args: any[]) => (mockUpdateDoc as any)(...args),
     getDoc: vi.fn(),
 }));
 
